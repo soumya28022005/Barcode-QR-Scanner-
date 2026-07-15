@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-canvas text-ink font-body antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+  }
+  ::selection {
+    @apply bg-harvest-300/50;
+  }
+  *:focus-visible {
+    outline: 2px solid #3F7856;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Perforated "ticket stub" edge — the signature motif, echoing a physical
+     ration / meal coupon torn along a dotted line. Used to frame the
+     identity + result cards throughout the app. */
+  .ticket-notch {
+    position: relative;
+  }
+  .ticket-notch::before,
+  .ticket-notch::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    background: #F3F4EF;
+    border-radius: 9999px;
+    transform: translateY(-50%);
+    z-index: 5;
+  }
+  .ticket-notch::before {
+    left: -11px;
+  }
+  .ticket-notch::after {
+    right: -11px;
+  }
+  .ticket-perf {
+    background-image: linear-gradient(to bottom, transparent 0, transparent 3px, #C9CDC5 3px, #C9CDC5 4px, transparent 4px);
+    background-size: 1px 10px;
+    background-repeat: repeat-y;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
