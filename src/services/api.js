@@ -1,46 +1,40 @@
-import axios from 'axios'
+import axios from 'axios';
 
-const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
-  timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+// Vite environment variable থেকে বেস ইউআরএল নেওয়া হচ্ছে
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:10000/api',
+});
 
-apiClient.interceptors.request.use((config) => {
-  return config
-})
-
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Let 409 (Conflict) pass through so UI can handle "Already Served" specifically
-    if (error.response?.status === 409) {
-      return Promise.reject(error)
-    }
-    const message =
-      error?.response?.data?.message ||
-      error?.message ||
-      'Something went wrong. Please try again.'
-    return Promise.reject({ ...error, message })
+// রিকোয়েস্ট ইন্টারসেপ্টর: প্রতিটি API কলে স্বয়ংক্রিয়ভাবে টোকেন পাঠানো
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
   }
-)
+  return req;
+});
 
-export const verifyQrCode = (token) => {
-  return apiClient.get(`/students/by-token/${token}`).then((res) => res.data)
-}
+// --- API Endpoints ---
 
-export const submitFoodSelection = (payload) => {
-  return apiClient.post('/submit', payload).then((res) => res.data)
-}
+// ১. অথেনটিকেশন
+export const loginStaff = (credentials) => API.post('/auth/login', credentials);
 
-export const searchByEmail = (email) => {
-  return apiClient.get('/students/search', { params: { email } }).then((res) => res.data)
-}
+// ২. কিউআর স্ক্যান এবং লুকআপ 
+export const verifyQrCode = (token) => API.get(`/students/by-token/${token}`);
 
-export const fetchDashboard = (params = {}) => {
-  return apiClient.get('/dashboard', { params }).then((res) => res.data)
-}
+// ৩. ম্যানুয়াল সার্চ (reissue desk এর জন্য)
+export const searchStudent = (query) => API.get(`/students/search?query=${query}`);
 
-export default apiClient
+// ৪. খাবার সাবমিট (Atomic Update)
+export const submitFoodClaim = (submitData) => API.post('/submit', submitData);
+
+// ৫. টোকেন রি-ইস্যু (অ্যাডমিন অনলি)
+export const reissueQRToken = (reissueData) => API.post('/reissue', reissueData);
+
+// ৬. ম্যানুয়ালি নতুন স্টুডেন্ট অ্যাড (অ্যাডমিন অনলি)
+export const manualAddStudent = (studentData) => API.post('/students/manual-add', studentData);
+
+// ৭. ড্যাশবোর্ড ডেটা ফেচ
+export const fetchDashboard = () => API.get('/dashboard');
+
+export default API;

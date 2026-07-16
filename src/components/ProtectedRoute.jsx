@@ -1,0 +1,19 @@
+import { Navigate } from 'react-router-dom';
+
+const ProtectedRoute = ({ children, requireAdmin = false }) => {
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // যদি রুটটি শুধুমাত্র অ্যাডমিনদের জন্য হয় (যেমন: Dashboard বা Reissue)
+  if (requireAdmin && role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+export default ProtectedRoute;

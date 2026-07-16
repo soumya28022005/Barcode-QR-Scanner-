@@ -1,22 +1,43 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar.jsx'
-import QRScannerPage from './pages/QRScannerPage.jsx'
-import FoodSelectionPage from './pages/FoodSelectionPage.jsx'
-import TotalViewPage from './pages/TotalViewPage.jsx'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import QRScannerPage from './pages/QRScannerPage';
+import TotalViewPage from './pages/TotalViewPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar'; // Navbar ইমপোর্ট করা হলো
 
-export default function App() {
+function App() {
   return (
-    <div className="min-h-screen bg-canvas">
-      <Navbar />
-      <main>
-        <Routes>
-          <Route path="/" element={<QRScannerPage />} />
-          <Route path="/food-selection" element={<FoodSelectionPage />} />
-          <Route path="/total-view" element={<TotalViewPage />} />
-          <Route path="*" element={<QRScannerPage />} />
-        </Routes>
-      </main>
-    </div>
-  )
+    <Router>
+      {/* Navbar সব পেজের ওপরে থাকবে (যদি ইউজার লগইন করা থাকে) */}
+      <Navbar /> 
+      
+      <Routes>
+        {/* পাবলিক রুট - লগইন পেজ */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* প্রটেক্টেড রুট - স্ক্যানার (অ্যাডমিন এবং ভলান্টিয়ার উভয়ের জন্য) */}
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <QRScannerPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* প্রটেক্টেড রুট - ড্যাশবোর্ড (শুধুমাত্র অ্যাডমিনদের জন্য) */}
+        <Route 
+          path="/total-view" 
+          element={
+            <ProtectedRoute requireAdmin={true}>
+              <TotalViewPage />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
+    </Router>
+  );
 }
+
+export default App;

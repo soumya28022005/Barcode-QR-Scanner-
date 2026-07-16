@@ -1,16 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
-import { ToastProvider } from './hooks/useToast.jsx'
 import './index.css'
+// ToastProvider ইমপোর্ট করুন (যদি আপনার প্রজেক্টে থাকে, এরর লগে ToastProvider দেখা যাচ্ছে)
+import { ToastProvider } from './hooks/useToast.jsx' 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </BrowserRouter>
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </React.StrictMode>,
 )
